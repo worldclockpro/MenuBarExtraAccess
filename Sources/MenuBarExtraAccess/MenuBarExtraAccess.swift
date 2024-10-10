@@ -170,9 +170,9 @@ struct MenuBarExtraAccess<Content: Scene>: Scene {
     
     // MARK: Observers
     
-    private var observerContainer = ObserverContainer()
+    @StateObject private var observerContainer = ObserverContainer()
     
-    private class ObserverContainer {
+    private class ObserverContainer: ObservableObject {
         private var statusItemIntrospectionSetup: Bool = false
         private var observer: NSStatusItem.ButtonStateObserver?
         private var eventsMonitor: Any?
@@ -195,8 +195,8 @@ struct MenuBarExtraAccess<Content: Scene>: Scene {
             _ block: @escaping () -> NSStatusItem.ButtonStateObserver?
         ) {
             // run async so that it can execute after SwiftUI sets up the NSStatusItem
-            DispatchQueue.main.async { [self] in
-                observer = block()
+            DispatchQueue.main.async { [weak self] in
+                self?.observer = block()
             }
         }
         
@@ -204,13 +204,13 @@ struct MenuBarExtraAccess<Content: Scene>: Scene {
             _ block: @escaping () -> Any?
         ) {
             // run async so that it can execute after SwiftUI sets up the NSStatusItem
-            DispatchQueue.main.async { [self] in
+            DispatchQueue.main.async { [weak self] in
                 // tear down old monitor, if one exists
-                if let eventsMonitor = eventsMonitor {
+                if let eventsMonitor = self?.eventsMonitor {
                     NSEvent.removeMonitor(eventsMonitor)
                 }
                 
-                eventsMonitor = block()
+                self?.eventsMonitor = block()
             }
         }
         
@@ -220,13 +220,13 @@ struct MenuBarExtraAccess<Content: Scene>: Scene {
             didResignKey didResignKeyBlock: @escaping (_ window: NSWindow) -> Void
         ) {
             // run async so that it can execute after SwiftUI sets up the NSStatusItem
-            DispatchQueue.main.async { [self] in
-                windowDidBecomeKeyObserver = MenuBarExtraUtils.newWindowObserver(
+            DispatchQueue.main.async { [weak self] in
+                self?.windowDidBecomeKeyObserver = MenuBarExtraUtils.newWindowObserver(
                     index: index,
                     for: NSWindow.didBecomeKeyNotification
                 ) { window in didBecomeKeyBlock(window) }
                 
-                windowDidResignKeyObserver = MenuBarExtraUtils.newWindowObserver(
+                self?.windowDidResignKeyObserver = MenuBarExtraUtils.newWindowObserver(
                     index: index,
                     for: NSWindow.didResignKeyNotification
                 ) { window in didResignKeyBlock(window) }
