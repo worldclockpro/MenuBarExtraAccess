@@ -11,8 +11,10 @@ let package = Package(
     targets: [
         .target(
             name: "MenuBarExtraAccess",
-            swiftSettings: [.define("DEBUG", .when(configuration: .debug))]
-        ),
-        .testTarget(name: "MenuBarExtraAccessTests", dependencies: ["MenuBarExtraAccess"]),
+            swiftSettings: [
+                // un-comment to enable debug logging
+                // .define("MENUBAREXTRAACCESS_DEBUG_LOGGING=1")
+            ]
+        )
     ]
 )

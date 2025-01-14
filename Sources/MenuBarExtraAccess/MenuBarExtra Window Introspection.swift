@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+@MainActor // required for Xcode 15 builds
 extension View {
     /// Provides introspection on the underlying window presented by `MenuBarExtra`.
     /// Add this view modifier to the top level of the View that occupies the `MenuBarExtra` content.
@@ -19,7 +20,7 @@ extension View {
         self
             .onAppear {
                 guard let window = MenuBarExtraUtils.window(for: .index(index)) else {
-                    #if DEBUG
+                    #if MENUBAREXTRAACCESS_DEBUG_LOGGING
                     print("Cannot call introspection block for status item because its window could not be found.")
                     #endif
                     
